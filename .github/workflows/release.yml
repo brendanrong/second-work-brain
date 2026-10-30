@@ -1,0 +1,44 @@
+name: Release
+
+# Tag a version (git tag v1.3.0 && git push --tags) and this builds the
+# Cowork .skill bundle from skills/second-work-brain and attaches it to a
+# GitHub release. The bundle is never committed; the source folder is the
+# only copy.
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check the tag matches plugin.json
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          manifest="$(jq -r .version .claude-plugin/plugin.json)"
+          if [ "$tag" != "$manifest" ]; then
+            echo "Tag v$tag does not match plugin.json version $manifest" >&2
+            exit 1
+          fi
+
+      - name: Build second-work-brain.skill
+        run: |
+          cd skills
+          zip -r ../second-work-brain.skill second-work-brain -x '*.DS_Store'
+          cd ..
+          unzip -l second-work-brain.skill
+
+      - name: Create release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "$GITHUB_REF_NAME" second-work-brain.skill \
+            --title "$GITHUB_REF_NAME" \
+            --generate-notes

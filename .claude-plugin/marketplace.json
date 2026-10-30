@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "brendanrong",
+  "description": "Brendan Rong's Claude Code plugins",
+  "owner": {
+    "name": "Brendan Rong"
+  },
+  "plugins": [
+    {
+      "name": "second-work-brain",
+      "source": "./",
+      "description": "One skill that builds and maintains a persistent work brain: context files plus a Karpathy-style LLM wiki, for any kind of work.",
+      "category": "productivity"
+    }
+  ]
+}

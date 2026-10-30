@@ -1,0 +1,32 @@
+schema_version: "1.1"
+name: ingest-pasted-text
+context:
+  scaffold_script: fixture.sh
+graders:
+  - name: raw-saved
+    type: file_exists
+    path: "**/wiki/raw/*"
+  - name: source-page-created
+    type: file_exists
+    path: "**/wiki/pages/src-*"
+  - name: ingest-quality
+    type: llm
+    focus: trace
+    weight: 2
+    criteria: |
+      The folder is an existing Work Brain for Harbour Goods, a candle wholesaler. The wiki already has an entity page wiki/pages/northlight-wax.md (the wax supplier, with Q4 pricing of $4.10/kg per carton and $3.85/kg at 100 kg+) and an open item asking whether 40 kg extra can land by 1 Nov. The user pasted an email from the supplier confirming it.
+
+      PASS if the agent:
+      - Saves the email verbatim into wiki/raw/ (not a summary).
+      - Writes a new source page (src-...) in wiki/pages/ with frontmatter.
+      - Updates northlight-wax.md: the 40 kg confirmation (dispatch 27 Oct, lands by 30 Oct, $3.85/kg) and the 24 Dec to 5 Jan closure with the 18 Dec order deadline. Existing content is kept, not replaced.
+      - Closes or updates the related open item (on northlight-wax, fig-and-co, or harbour-goods).
+      - Updates wiki/index.md (page count and the new source line) and appends an ingest entry to wiki/log.md.
+      - Tells the user the 2 to 4 most useful things in the email.
+
+      FAIL if the agent:
+      - Asks the user to save or file the text first.
+      - Puts a digest or summary into wiki/raw/ instead of the verbatim email.
+      - Deletes existing pricing from northlight-wax.md.
+      - Leaves index.md or log.md untouched.
+      - Invents facts not in the email (for example a dispatch date other than 27 Oct).

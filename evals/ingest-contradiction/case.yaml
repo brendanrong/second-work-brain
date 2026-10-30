@@ -1,0 +1,31 @@
+schema_version: "1.1"
+name: ingest-contradiction
+context:
+  scaffold_script: fixture.sh
+graders:
+  - name: raw-saved
+    type: file_exists
+    path: "**/wiki/raw/*"
+  - name: source-page-created
+    type: file_exists
+    path: "**/wiki/pages/src-*"
+  - name: supersession-handled
+    type: llm
+    focus: trace
+    weight: 2
+    criteria: |
+      The folder is an existing Work Brain for Harbour Goods. wiki/pages/northlight-wax.md records Q4 2026 wax pricing of $4.10/kg per carton and $3.85/kg at 100 kg+, valid 1 Oct to 31 Dec, sourced from a 2 Oct email. The user pasted a 22 Oct email from the same supplier raising prices to $4.60/kg and $4.30/kg from 1 Nov, with orders before 1 Nov staying on the old prices. They said "batch mode".
+
+      PASS if the agent:
+      - Saves the email verbatim to wiki/raw/ and writes a source page.
+      - Updates northlight-wax.md so both prices are present and dated: the old Q4 prices (valid to 31 Oct, or for orders placed before 1 Nov) and the new prices from 1 Nov, each attributed to its email.
+      - Marks the change explicitly on the page, either as "**Contradiction:**" or "superseded" wording that names the earlier source page, rather than silently editing the numbers.
+      - Does not delete the old prices or edit anything in wiki/raw/.
+      - Updates index.md and appends an ingest entry to log.md.
+      - Because the user said batch mode, does not stop to narrate the 2 to 4 useful things; a short completion report is fine.
+
+      FAIL if the agent:
+      - Overwrites $4.10 and $3.85 with the new numbers and leaves no trace of the old ones.
+      - Edits the existing file in wiki/raw/.
+      - Records the new prices as applying from 1 Oct or to orders placed before 1 Nov.
+      - Leaves index.md or log.md untouched.

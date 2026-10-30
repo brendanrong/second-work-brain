@@ -1,0 +1,36 @@
+schema_version: "1.1"
+name: review-existing-brain
+tags: [review]
+execution:
+  max_turns: 15
+  allowed_tools: [Read, Glob, Grep, Skill]
+context:
+  scaffold_script: fixture.sh
+graders:
+  - name: skill-fired
+    type: tool_used
+    tool: Skill
+    input_match: '"skill"\s*:\s*"(?:[\w-]+:)?second-work-brain"'
+    arm: with-only
+  - name: no-writes
+    type: tool_used
+    tool: Write
+    min: 0
+    max: 0
+  - name: review-quality
+    type: llm
+    focus: last_message
+    weight: 2
+    criteria: |
+      The folder is an existing Work Brain (CLAUDE.md, context.md, corrections.md, wiki/) for a candle wholesaler called Harbour Goods. The user asked for a review.
+
+      PASS if the reply:
+      - Shows it read CLAUDE.md, context.md, corrections.md and wiki/index.md (it refers to specific content from them, such as the Fig & Co Christmas order, the Northlight Wax pricing, or the two logged corrections).
+      - Proposes specific improvements, quoting any line it would change and saying why, as a diff or before/after.
+      - Asks for a yes before writing, and writes nothing.
+
+      FAIL if the reply:
+      - Is generic advice that could apply to any folder.
+      - Rewrites or claims to have rewritten CLAUDE.md, context.md or WIKI.md.
+      - Suggests removing or softening the Non-negotiables or Hard boundary sections.
+      - Suggests renaming context.md back to memory.md.

@@ -1,0 +1,18 @@
+{
+  "name": "second-work-brain",
+  "version": "1.3.0",
+  "description": "One skill that builds and maintains a persistent work brain: context files plus a Karpathy-style LLM wiki, for any kind of work.",
+  "author": {
+    "name": "Brendan Rong"
+  },
+  "homepage": "https://github.com/brendanrong/second-work-brain",
+  "repository": "https://github.com/brendanrong/second-work-brain",
+  "license": "MIT",
+  "keywords": [
+    "second-brain",
+    "wiki",
+    "context",
+    "knowledge-base",
+    "productivity"
+  ]
+}
