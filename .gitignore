@@ -1,0 +1,7 @@
+# Built by the release workflow, never committed
+second-work-brain.skill
+
+# Eval runs
+evals/results/
+
+.DS_Store
